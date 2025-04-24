@@ -24,6 +24,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity_dashboard"/>
+        <activity android:name=".AddExpenseActivity"/>
+        <activity android:name=".AddIncomeActivity"/>
+        <activity android:name=".signupActivity"/>
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

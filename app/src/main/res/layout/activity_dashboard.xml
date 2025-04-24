@@ -1,146 +1,157 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
+    android:fillViewport="true"
     android:background="@android:color/white">
 
-    <!-- Current Balance -->
-    <ImageView
-        android:id="@+id/imageView4"
-        android:layout_width="wrap_content"
-        android:layout_height="94dp"
-        android:contentDescription="@string/login"
-        android:src="@drawable/logo" />
-
-    <TextView
-        android:id="@+id/tv_current_balance"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Current Balance: LKR 0.00"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:textColor="@android:color/black"
-        android:padding="8dp" />
-
-    <!-- Income & Expense Cards -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="2"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <!-- Expense -->
-        <LinearLayout
-            android:id="@+id/btn_expense"
-            android:layout_weight="1"
-            android:layout_width="0dp"
+        <!-- Logo -->
+        <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="wrap_content"
+            android:layout_height="94dp"
+            android:contentDescription="@string/login"
+            android:src="@drawable/logo"
+            android:layout_gravity="center_horizontal" />
+
+        <!-- Current Balance -->
+        <TextView
+            android:id="@+id/tv_current_balance"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@color/grey"
-            android:padding="16dp"
-            android:layout_marginEnd="8dp"
+            android:text="Current Balance: LKR 0.00"
+            android:textSize="20sp"
+            android:textStyle="bold"
             android:gravity="center"
-            android:backgroundTint="@color/black">
+            android:textColor="@android:color/black"
+            android:padding="8dp" />
 
-            <TextView
-                android:id="@+id/tv_expense"
-                android:layout_width="wrap_content"
+        <!-- Income & Expense Cards -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
+
+            <!-- Expense -->
+            <LinearLayout
+                android:id="@+id/btn_expense"
+                android:layout_weight="1"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:layout_marginEnd="8dp"
                 android:gravity="center"
-                android:text="@string/Expense"
-                android:textColor="@android:color/white"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:backgroundTint="@color/black"
+                android:background="@color/grey">
+
+                <TextView
+                    android:id="@+id/tv_expense"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/Expense"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Income -->
+            <LinearLayout
+                android:id="@+id/btn_income"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:layout_marginStart="8dp"
+                android:gravity="center"
+                android:backgroundTint="@color/black"
+                android:background="@color/grey">
+
+                <TextView
+                    android:id="@+id/tv_income"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/Income"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
         </LinearLayout>
 
-        <!-- Income -->
+        <!-- Budget Input -->
         <LinearLayout
-            android:id="@+id/btn_income"
-            android:layout_weight="1"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@color/grey"
-            android:padding="16dp"
-            android:layout_marginStart="8dp"
-            android:gravity="center"
-            android:backgroundTint="@color/black">
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:layout_marginBottom="4dp">
 
-            <TextView
-                android:id="@+id/tv_income"
+            <EditText
+                android:id="@+id/et_budget"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:hint="Enter Budget"
+                android:inputType="numberDecimal"
+                android:padding="8dp"
+                android:background="@android:drawable/editbox_background"
+                android:textColor="@android:color/black" />
+
+            <Button
+                android:id="@+id/btn_set_budget"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/Income"
-                android:textColor="@android:color/white"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:layout_marginStart="8dp"
+                android:backgroundTint="@color/orange"
+                android:text="Set"
+                android:textColor="@android:color/white" />
         </LinearLayout>
-    </LinearLayout>
 
-    <!-- Budget Info Section -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:layout_marginBottom="4dp">
-
-        <EditText
-            android:id="@+id/et_budget"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:hint="Enter Budget"
-            android:inputType="numberDecimal"
-            android:padding="8dp"
-            android:background="@android:drawable/editbox_background"
-            android:textColor="@android:color/black" />
-
-        <Button
-            android:id="@+id/btn_set_budget"
+        <!-- Budget Display -->
+        <TextView
+            android:id="@+id/tv_budget"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:paddingBottom="4dp"
+            android:text="Budget: LKR 0.00"
+            android:textColor="@color/orange"
+            android:textSize="16sp"
+            android:textStyle="italic" />
+
+        <!-- Transaction Header -->
+
+        <Button
+            android:id="@+id/btn_view_transactions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="View Transactions"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
             android:backgroundTint="@color/orange"
-            android:text="Set"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/white"/>
+
+
+        <!-- Transaction RecyclerView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_transactions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:nestedScrollingEnabled="false"/>
     </LinearLayout>
-
-    <!-- Budget Display -->
-    <TextView
-        android:id="@+id/tv_budget"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:paddingBottom="4dp"
-        android:text="Budget: LKR 0.00"
-        android:textColor="@color/orange"
-        android:textSize="16sp"
-        android:textStyle="italic" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Transaction History"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:paddingTop="12dp"
-        android:paddingBottom="4dp"
-        android:textColor="@android:color/black" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_transactions"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginTop="4dp" />
-</LinearLayout>
+</ScrollView>
