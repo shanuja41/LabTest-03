@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">LabTest3</string>
+    <string name="login">Login</string>
+    <string name="username">Username</string>
+    <string name="Eusername">Enter username</string>
+    <string name="password">Password</string>
+    <string name="Epassword">Enter password</string>
+    <string name="signupredirect">Don\'t have an account SignUp?</string>
+    <string name="loginredirect">Already have an account LogIn.</string>
+
+    <string name="Signup">Signup</string>
+    <string name="phonenum">Phonenumber</string>
+    <string name="Ephonenum">Enter phonenumber</string>
+
+
+    <string name="Expense">Add Expense -</string>
+    <string name="Income">Add Income +</string>
+
+</resources>
