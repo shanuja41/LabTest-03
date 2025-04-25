@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import androidx.activity.ComponentActivity
 
 class loginActivity : ComponentActivity() {
@@ -27,6 +28,13 @@ class loginActivity : ComponentActivity() {
                 startActivity(intent)
                 finish()
             }
+        }
+
+        val reSignup = findViewById<TextView>(R.id.redirect_Signup)
+        reSignup.setOnClickListener {
+            val intent = Intent(this, signupActivity::class.java)
+            startActivity(intent)
+            finish()
         }
     }
 

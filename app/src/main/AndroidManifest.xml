@@ -30,7 +30,7 @@
         <activity android:name=".AddExpenseActivity"/>
         <activity android:name=".AddIncomeActivity"/>
         <activity android:name=".EditTransaction"/>
-
+        <activity android:name=".signupActivity"/>
 
         <meta-data
             android:name="preloaded_fonts"

@@ -111,7 +111,10 @@ class activity_dashboard : ComponentActivity() {
         val adapter = TransactionAdapter(
             transactions,
             onEditClick = { transaction ->
-                Toast.makeText(this, "Edit clicked for: ${transaction.title}", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, EditTransaction::class.java)
+                intent.putExtra("TRANSACTION_ID", transaction.id)  // Pass transaction ID
+                startActivity(intent)
+//                Toast.makeText(this, "Edit clicked for: ${transaction.title}", Toast.LENGTH_SHORT).show()
             },
             onDeleteClick = { transaction ->
                 pref.deleteTransaction(transaction.id)
