@@ -1,16 +1,20 @@
 package com.example.labtest3
 
-import android.annotation.SuppressLint
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.activity.ComponentActivity
+import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.labtest3.adapter.TransactionAdapter
-import com.example.labtest3.model.Transaction
+import com.example.labtest3.utils.NotificationHelper
 import com.example.labtest3.utils.SharedPrefHelper
 
 class activity_dashboard : ComponentActivity() {
@@ -24,12 +28,13 @@ class activity_dashboard : ComponentActivity() {
     private lateinit var btnExpense: LinearLayout
     private lateinit var btnIncome: LinearLayout
 
-    @SuppressLint("MissingInflatedId")
+    private lateinit var pref: SharedPrefHelper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
 
-        // Linking Views
+        // View bindings
         tvBudget = findViewById(R.id.tv_budget)
         etBudget = findViewById(R.id.et_budget)
         btnSetBudget = findViewById(R.id.btn_set_budget)
@@ -39,39 +44,21 @@ class activity_dashboard : ComponentActivity() {
         btnExpense = findViewById(R.id.btn_expense)
         btnIncome = findViewById(R.id.btn_income)
 
-        // Setup RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(this)
-        val pref = SharedPrefHelper(this)
-        val transactions = pref.getTransactions() // Assuming this returns a List<Transaction>
+        pref = SharedPrefHelper(this)
 
-        // Update: Add lambdas for edit and delete actions
-        val adapter = TransactionAdapter(
-            transactions,
-            onEditClick = { transaction ->
-                // Handle edit action (e.g., launch an edit screen or modify the transaction)
-                Toast.makeText(this, "Edit clicked for: ${transaction.title}", Toast.LENGTH_SHORT).show()
-                // Add your edit logic here
-            },
-            onDeleteClick = { transaction ->
-                // Handle delete action
-                pref.deleteTransaction(transaction.id)
-                refreshTransactions()  // Update the transaction list after deletion
-                Toast.makeText(this, "Transaction deleted", Toast.LENGTH_SHORT).show()
-            }
-        )
-        recyclerView.adapter = adapter
+        createNotificationChannel()
+        askNotificationPermission()
 
-        // Load saved budget
-        val sharedPrefs = getSharedPreferences("finance_prefs", Context.MODE_PRIVATE)
-        val savedBudget = sharedPrefs.getFloat("budget", 0f)
-        tvBudget.text = "Budget: LKR %.2f".format(savedBudget)
+        loadBudget()
+        updateCurrentBalance()
+        setRecyclerView()
 
-        // Set Budget Button
         btnSetBudget.setOnClickListener {
             val input = etBudget.text.toString()
             if (input.isNotEmpty()) {
-                val budgetValue = input.toFloat()
-                sharedPrefs.edit().putFloat("budget", budgetValue).apply()
+                val budgetValue = input.toDouble()
+                pref.setBudget(budgetValue)
                 tvBudget.text = "Budget: LKR %.2f".format(budgetValue)
                 Toast.makeText(this, "Budget saved!", Toast.LENGTH_SHORT).show()
                 etBudget.text.clear()
@@ -80,53 +67,113 @@ class activity_dashboard : ComponentActivity() {
             }
         }
 
-        // View Transactions Button
         btnViewTransactions.setOnClickListener {
-            if (recyclerView.visibility == View.GONE) {
-                recyclerView.visibility = View.VISIBLE
-            } else {
-                recyclerView.visibility = View.GONE
-            }
+            recyclerView.visibility =
+                if (recyclerView.visibility == View.GONE) View.VISIBLE else View.GONE
         }
 
-        // Expense Button Action
         btnExpense.setOnClickListener {
-            // Handle expense action here
-            val intent = Intent(this, AddExpenseActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, AddExpenseActivity::class.java))
             finish()
-            Toast.makeText(this, "Expense clicked", Toast.LENGTH_SHORT).show()
         }
 
-        // Income Button Action
         btnIncome.setOnClickListener {
-            // Handle income action here
-            val intent = Intent(this, AddIncomeActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, AddIncomeActivity::class.java))
             finish()
-            Toast.makeText(this, "Income clicked", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun refreshTransactions() {
-        val pref = SharedPrefHelper(this)
-        val transactions = pref.getTransactions() // Get updated list of transactions
+    private fun loadBudget() {
+        val savedBudget = pref.getBudget()
+        tvBudget.text = "Budget: LKR %.2f".format(savedBudget)
+    }
+
+    private fun updateCurrentBalance() {
+        val transactions = pref.getTransactions()
+        var incomeTotal = 0.0
+        var expenseTotal = 0.0
+
+        for (transaction in transactions) {
+            if (transaction.type.equals("income", ignoreCase = true)) {
+                incomeTotal += transaction.amount
+            } else if (transaction.type.equals("expense", ignoreCase = true)) {
+                expenseTotal += transaction.amount
+            }
+        }
+
+        val currentBalance = incomeTotal - expenseTotal
+        tvCurrentBalance.text = "Current Balance: LKR %.2f".format(currentBalance)
+    }
+
+    private fun setRecyclerView() {
+        val transactions = pref.getTransactions()
+
         val adapter = TransactionAdapter(
             transactions,
             onEditClick = { transaction ->
-
-//                val intent = Intent(this, activity_dashboard::class.java)
-//                startActivity(intent)
-//                finish()
-                // Handle edit action (can be more specific based on your needs)
                 Toast.makeText(this, "Edit clicked for: ${transaction.title}", Toast.LENGTH_SHORT).show()
             },
             onDeleteClick = { transaction ->
-                // Handle delete action
                 pref.deleteTransaction(transaction.id)
+                refreshTransactions()
                 Toast.makeText(this, "Transaction deleted", Toast.LENGTH_SHORT).show()
             }
         )
+
         recyclerView.adapter = adapter
+    }
+
+    private fun refreshTransactions() {
+        setRecyclerView()
+        updateCurrentBalance()
+
+        // Show budget overflow alert if expenses exceed the budget
+        val currentExpenseTotal = calculateTotalExpense()
+        val budget = pref.getBudget()
+
+        if (currentExpenseTotal > budget) {
+            NotificationHelper(this).showBudgetAlert()
+        }
+    }
+
+    private fun calculateTotalExpense(): Double {
+        val transactions = pref.getTransactions()
+        var expenseTotal = 0.0
+        for (transaction in transactions) {
+            if (transaction.type.equals("expense", ignoreCase = true)) {
+                expenseTotal += transaction.amount
+            }
+        }
+        return expenseTotal
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshTransactions()
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "Budget Alert"
+            val description = "Alerts when expenses exceed the budget"
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel = NotificationChannel("budget_alert_channel", name, importance).apply {
+                this.description = description
+            }
+
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    private fun askNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                101
+            )
+        }
     }
 }
