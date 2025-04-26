@@ -1,20 +1,14 @@
 package com.example.labtest3
 
-import android.Manifest
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.activity.ComponentActivity
-import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.labtest3.adapter.TransactionAdapter
-import com.example.labtest3.utils.NotificationHelper
 import com.example.labtest3.utils.SharedPrefHelper
 
 class activity_dashboard : ComponentActivity() {
@@ -47,9 +41,6 @@ class activity_dashboard : ComponentActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
         pref = SharedPrefHelper(this)
 
-        createNotificationChannel()
-        askNotificationPermission()
-
         loadBudget()
         updateCurrentBalance()
         setRecyclerView()
@@ -74,12 +65,10 @@ class activity_dashboard : ComponentActivity() {
 
         btnExpense.setOnClickListener {
             startActivity(Intent(this, AddExpenseActivity::class.java))
-            finish()
         }
 
         btnIncome.setOnClickListener {
             startActivity(Intent(this, AddIncomeActivity::class.java))
-            finish()
         }
     }
 
@@ -112,9 +101,8 @@ class activity_dashboard : ComponentActivity() {
             transactions,
             onEditClick = { transaction ->
                 val intent = Intent(this, EditTransaction::class.java)
-                intent.putExtra("TRANSACTION_ID", transaction.id)  // Pass transaction ID
                 startActivity(intent)
-//                Toast.makeText(this, "Edit clicked for: ${transaction.title}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Edit clicked for: ${transaction.title}", Toast.LENGTH_SHORT).show()
             },
             onDeleteClick = { transaction ->
                 pref.deleteTransaction(transaction.id)
@@ -129,14 +117,6 @@ class activity_dashboard : ComponentActivity() {
     private fun refreshTransactions() {
         setRecyclerView()
         updateCurrentBalance()
-
-        // Show budget overflow alert if expenses exceed the budget
-        val currentExpenseTotal = calculateTotalExpense()
-        val budget = pref.getBudget()
-
-        if (currentExpenseTotal > budget) {
-            NotificationHelper(this).showBudgetAlert()
-        }
     }
 
     private fun calculateTotalExpense(): Double {
@@ -153,30 +133,21 @@ class activity_dashboard : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         refreshTransactions()
+        checkExpenseOverflowAlert()
     }
 
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "Budget Alert"
-            val description = "Alerts when expenses exceed the budget"
-            val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel("budget_alert_channel", name, importance).apply {
-                this.description = description
+    private fun checkExpenseOverflowAlert() {
+        val totalExpense = calculateTotalExpense()
+        val budget = pref.getBudget()
+
+        if (totalExpense > budget) {
+            val builder = android.app.AlertDialog.Builder(this)
+            builder.setTitle("Budget Exceeded!")
+            builder.setMessage("Your expenses have exceeded your set budget. Please review your expenses.")
+            builder.setPositiveButton("OK") { dialog, _ ->
+                dialog.dismiss()
             }
-
-            val notificationManager: NotificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
-    }
-
-    private fun askNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                101
-            )
+            builder.show()
         }
     }
 }
