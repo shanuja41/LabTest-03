@@ -20,14 +20,14 @@
             android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/etEditTitle"
+            android:id="@+id/etTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Title"
             android:inputType="text" />
 
         <EditText
-            android:id="@+id/etEditAmount"
+            android:id="@+id/etAmount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Amount"
@@ -35,7 +35,7 @@
             android:layout_marginTop="12dp" />
 
         <EditText
-            android:id="@+id/etEditCategory"
+            android:id="@+id/etCategory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Category"
@@ -43,20 +43,20 @@
             android:layout_marginTop="12dp" />
 
         <RadioGroup
-            android:id="@+id/rgEditType"
+            android:id="@+id/rgType"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="12dp">
 
             <RadioButton
-                android:id="@+id/rbEditIncome"
+                android:id="@+id/rbIncome"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Income" />
 
             <RadioButton
-                android:id="@+id/rbEditExpense"
+                android:id="@+id/rbExpense"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Expense"
